@@ -9,7 +9,7 @@ run ```make```
 ## Build Instructions Using GCC ##
 
 For the register setting utility:
-gcc -o lb-gps lb-gps-linux.cpp -lstdc++
+gcc -o lb-gps lb-gps-linux.cpp GPSSettings.cpp -lstdc++
 
 For the status utility:
 gcc -o lb-gps-status lb-gps-linux-status.cpp -lstdc++
