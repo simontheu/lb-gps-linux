@@ -42,7 +42,7 @@ const char *bus_str(int bus);
 
 int main(int argc, char **argv)
 {
-      cout << "Leo Bodnar GPS Clock" << endl;
+      cout << "Leo Bodnar GPS Clock Status" << endl;
       
       int fd;
       int i, res, desc_size = 0;
@@ -50,23 +50,10 @@ int main(int argc, char **argv)
 
       struct hidraw_devinfo info;
 
-      GPSSettings *currentSettings = new GPSSettings;
-
    /* Open the Device with non-blocking reads. In real life,
       don't use a hard coded path; use libudev instead. 
    */
-      if (argc == 1)
-      {
-            printf("usage: lb-gps-clock /dev/hidraw?? [--n31] [--n2_ls] [--n2_hs] [--n1_hs] [--nc1_ls] [--nc2_ls]\n");
-            printf("      --gps:        integer within the range of 1 to 5000000\n");
-            printf("      --n31:        integer within the range 1 to 2^19\n");
-            printf("      --n2_ls:      even integer within the range 2 to 2^20\n");
-            printf("      --n2_hs:      from the range [4,5,6,7,8,9,10,11]\n");
-            printf("      --n1_hs:      from the range [4,5,6,7,8,9,10,11]\n");
-            printf("      --nc1_ls:     even integer within the range 2 to 2^20\n");
-            printf("      --nc2_ls:     even integer within  the range 2 to 2^20\n");
-            return -1;
-      }
+
 
       printf("Trying to open device %s\n", argv[1]);
 
@@ -81,17 +68,6 @@ int main(int argc, char **argv)
       //Device connected, setup report structs
       memset(&info, 0x0, sizeof(info));
 
-      /* Get Feature */
-      buf[0] = 0x9; /* Report Number */
-      res = ioctl(fd, HIDIOCGFEATURE(256), buf);
-
-      if (res < 0) {
-            perror("HIDIOCGFEATURE");
-      } else {
-            currentSettings->setParamsFromReadBuffer(buf,res);
-            currentSettings->printParameters();
-      }
-
       // Get Raw Info
       res = ioctl(fd, HIDIOCGRAWINFO, &info);
       
@@ -101,11 +77,13 @@ int main(int argc, char **argv)
       } 
       else
       {
-            printf("Raw Info:\n");
-            printf("\tbustype: %d (%s)\n",
-            info.bustype, bus_str(info.bustype));
+            printf("Device Info:\n");
             printf("\tvendor: 0x%04hx\n", info.vendor);
             printf("\tproduct: 0x%04hx\n", info.product);
+            if (info.vendor != VID_LB_USB || (info.product != PID_GPS_CLOCK && info.product != PID_MINI_GPS_CLOCK)) {
+                perror("Not a valid GPS Clock Device");
+                return -1;//Device not valid
+            }
       }
 
       /* Get Raw Name */
@@ -115,15 +93,34 @@ int main(int argc, char **argv)
             perror("HIDIOCGRAWNAME");
       else
             printf("Raw Name: %s\n", buf);
-
-            currentSettings->GPSSettings::processCommandLineArguments(argc, argv);
-            currentSettings->GPSSettings::printParameters();
-            currentSettings->GPSSettings::verifyParameters();
-            currentSettings->GPSSettings::getSendBuffer(buf,60);
-
-            /* Set Feature */
-            res = ioctl(fd, HIDIOCSFEATURE(60), buf);
-            if (res < 0) perror("HIDIOCSFEATURE");
+            /* Get Status */
+            int timeout = 0;
+            while (timeout < 1000){
+                int report_len = read(fd, buf, sizeof (buf));
+                printf(".");
+                if (report_len < 1)  {
+                    printf(".");
+                    //Create some delay before trying again.
+                    for (i = 0; i< 10000000; i++) {
+                        report_len = i*i;
+                    }
+                    timeout++;
+                } else {
+                    printf("\n");
+                    printf("Loss of Signal Count: %i\n", buf[0]);
+                    if (buf[1] & 0x01) {
+                        printf("Sat Status: Unlocked\n");
+                    } else {
+                        printf("Sat Status: Locked\n");
+                    }
+                    if (buf[1] & 0x02) {
+                        printf("PLL Status: Unlocked\n");
+                    } else {
+                        printf("PLL Status: Locked\n");
+                    }
+                    return buf[1] & 0x03;//Return locked status
+                }
+            }
 
       close(fd);
 
