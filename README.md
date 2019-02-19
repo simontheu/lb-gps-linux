@@ -2,9 +2,11 @@
 
 gcc g++
 
-## Build Instructions ##
+## Build Instructions Using Make ##
 
-To build the executable run the following
+run ```make```
+
+## Build Instructions Using GCC ##
 
 For the register setting utility:
 gcc -o lb-gps lb-gps-linux.cpp -lstdc++
