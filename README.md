@@ -2,6 +2,8 @@
 
 gcc g++
 
+make is optional depending on how you want to build it.
+
 ## Build Instructions Using Make ##
 
 run ```make```
