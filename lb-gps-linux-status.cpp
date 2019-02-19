@@ -66,6 +66,11 @@ int main(int argc, char **argv)
       }
 
       //Device connected, setup report structs
+<<<<<<< HEAD
+=======
+      //currentSettings.reportDescriptor??
+      //memset(&rpt_desc, 0x0, sizeof(rpt_desc));
+>>>>>>> 3a316a1da3be8202f8e6313813cfbb0404404288
       memset(&info, 0x0, sizeof(info));
 
       // Get Raw Info
@@ -77,6 +82,7 @@ int main(int argc, char **argv)
       } 
       else
       {
+<<<<<<< HEAD
             printf("Device Info:\n");
             printf("\tvendor: 0x%04hx\n", info.vendor);
             printf("\tproduct: 0x%04hx\n", info.product);
@@ -84,6 +90,13 @@ int main(int argc, char **argv)
                 perror("Not a valid GPS Clock Device");
                 return -1;//Device not valid
             }
+=======
+            printf("Raw Info:\n");
+            printf("\tbustype: %d (%s)\n",
+            info.bustype, bus_str(info.bustype));
+            printf("\tvendor: 0x%04hx\n", info.vendor);
+            printf("\tproduct: 0x%04hx\n", info.product);
+>>>>>>> 3a316a1da3be8202f8e6313813cfbb0404404288
       }
 
       /* Get Raw Name */
@@ -94,17 +107,27 @@ int main(int argc, char **argv)
       else
             printf("Raw Name: %s\n", buf);
             /* Get Status */
+<<<<<<< HEAD
             int timeout = 0;
             while (timeout < 1000){
                 int report_len = read(fd, buf, sizeof (buf));
                 printf(".");
+=======
+            while (1 ){
+                int report_len = read(fd, buf, sizeof (buf));
+                
+>>>>>>> 3a316a1da3be8202f8e6313813cfbb0404404288
                 if (report_len < 1)  {
                     printf(".");
                     //Create some delay before trying again.
                     for (i = 0; i< 10000000; i++) {
                         report_len = i*i;
                     }
+<<<<<<< HEAD
                     timeout++;
+=======
+                    
+>>>>>>> 3a316a1da3be8202f8e6313813cfbb0404404288
                 } else {
                     printf("\n");
                     printf("Loss of Signal Count: %i\n", buf[0]);
