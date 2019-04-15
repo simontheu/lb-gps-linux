@@ -37,20 +37,20 @@ using namespace std;
         uint8_t tempN1_HS = N1_HS - 4;
         uint32_t tempNC1_LS = NC1_LS - 1;//  = 10 -1;
         uint32_t tempNC2_LS = NC2_LS - 1;
-
+        uint32_t tempBW = bandwidth;
         buf[0] = 0; //reportID; // Report Number
         buf[1] = 0x04;// reportTag for set clock settings
 
-        memcpy(&buf[0x2], &GPSFrequency,       2 * sizeof(u_int8_t));
-        memcpy(&buf[0x5], &tempN31,                2 * sizeof(u_int8_t));
-        memcpy(&buf[0x8], &tempN2_HS,              2 * sizeof(u_int8_t));
-        memcpy(&buf[0x9], &tempN2_LS,              2 * sizeof(uint8_t));
-        memcpy(&buf[0xC], &tempN1_HS,              sizeof(u_int8_t));
-        memcpy(&buf[0xD], &tempNC1_LS,             2 * sizeof(u_int8_t));
-        memcpy(&buf[0x10], &tempNC2_LS,            2 * sizeof(u_int8_t));
+        memcpy(&buf[0x2], &GPSFrequency,           3 * sizeof(u_int8_t));
+        memcpy(&buf[0x5], &tempN31,                3 * sizeof(u_int8_t));
+        memcpy(&buf[0x8], &tempN2_HS,              1 * sizeof(u_int8_t));
+        memcpy(&buf[0x9], &tempN2_LS,              3 * sizeof(u_int8_t));
+        memcpy(&buf[0xC], &tempN1_HS,              1 * sizeof(u_int8_t));
+        memcpy(&buf[0xD], &tempNC1_LS,             3 * sizeof(u_int8_t));
+        memcpy(&buf[0x10], &tempNC2_LS,            3 * sizeof(u_int8_t));
 
         memcpy(&buf[0x13], &phase,             sizeof(uint8_t));
-        memcpy(&buf[0x14], &bandwidth,         sizeof(uint8_t));
+        memcpy(&buf[0x14], &tempBW,         sizeof(uint8_t));
 
     }
 
@@ -68,22 +68,24 @@ using namespace std;
         N1_HS = buf[12] + 4;
         NC1_LS = ((buf[15] << 16) + (buf[14] << 8) + buf[13]) + 1;
         NC2_LS = ((buf[18] << 16) + (buf[17] << 8) + buf[16]) + 1;
+        bandwidth = buf[20];
     }
 
     void GPSSettings::printParameters() {
         double VCO = (double(GPSFrequency) / double(N31)) * double(N2_HS) * double(N2_LS);
         double Out1 = VCO / double(N1_HS) / double(NC1_LS);
         double Out2 = VCO / double(N1_HS) / double(NC2_LS);
-        printf("GPS Frequency = %u\n", GPSFrequency);
-        printf("N31           = %u\n", N31);
-        printf("N2_HS         = %u\n", N2_HS);
-        printf("N2_LS         = %u\n", N2_LS);
-        printf("N1_HS         = %u\n", N1_HS);
-        printf("NC1_LS        = %u\n", NC1_LS);
-        printf("NC2_LS        = %u\n\n", NC2_LS);
-        printf("VCO           = %f Hz\n\n", VCO);
-        printf("Clock Out 1   = %f Hz\n", Out1);
-        printf("Clock Out 2   = %f Hz\n", Out2);
+        printf("    GPS Frequency = %u\n", GPSFrequency);
+        printf("    N31           = %u\n", N31);
+        printf("    N2_HS         = %u\n", N2_HS);
+        printf("    N2_LS         = %u\n", N2_LS);
+        printf("    N1_HS         = %u\n", N1_HS);
+        printf("    NC1_LS        = %u\n", NC1_LS);
+        printf("    NC2_LS        = %u\n\n", NC2_LS);
+        printf("    VCO           = %f Hz\n\n", VCO);
+        printf("    Clock Out 1   = %f Hz\n", Out1);
+        printf("    Clock Out 2   = %f Hz\n", Out2);
+        printf("    Bandwidth     = %u\n", bandwidth);
         
     }
 
@@ -108,6 +110,7 @@ using namespace std;
                   {"nc1_ls",    required_argument, 0, 'f'},
                   {"nc2_ls",    required_argument, 0, 'g'},
                   {"drive",    required_argument, 0, 'h'},
+                  {"bw",    required_argument, 0, 'i'},
                   {0, 0, 0, 0}
             };
             /* getopt_long stores the option index here. */
@@ -164,8 +167,8 @@ using namespace std;
                     driveStrength = atoi(optarg);
                     break;
                 
-                case 'i'://
-                    //NC2_LS = atoi(optarg);
+                case 'i'://Bandwith
+                    bandwidth = atoi(optarg);
                     break;
 
                 case '?':
@@ -178,11 +181,23 @@ using namespace std;
         } 
     }
 
+
     void GPSSettings::verifyParameters()
     {
+        double VCO = (double(GPSFrequency) / double(N31)) * double(N2_HS) * double(N2_LS);
         if (N31 < kN31LowerLimit || N31 > kN31UpperLimit) {
             printf("\n[Warning] Invalid Parameter: N31\n");
             printf("N31 Should be in the range from %i to %i\n", kN31LowerLimit, kN31UpperLimit);
+        }
+        if (bandwidth < kBandwidthLowerLimit || bandwidth > kBandwidthUpperLimit) {
+            printf("\n[Warning] Invalid Parameter: bw\n");
+            printf("Bandwidth should be in the range from %i to %i\n", kBandwidthLowerLimit, kBandwidthUpperLimit);
+        }
+        if (VCO < kVCOLowerLimit || VCO > kVCOUpperLimit) {
+            printf("\e[0;33m[Warning]\e[0m ");
+            printf("Invalid Parameters\n");
+            
+            printf("The VCO should fall between %fHz to %fHz\n", kVCOLowerLimit, kVCOUpperLimit);
         }
     }
 

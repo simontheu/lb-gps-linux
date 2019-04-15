@@ -10,6 +10,11 @@ static int verbose_flag;
 static const uint32_t kN31LowerLimit = 1;
 static const uint32_t kN31UpperLimit = 524288;
 
+static const uint32_t kBandwidthLowerLimit = 0;
+static const uint32_t kBandwidthUpperLimit = 15;
+
+static const double kVCOLowerLimit = 3500000000.00;
+static const double kVCOUpperLimit = 6500000000.00;
 
 class GPSSettings {
     public:

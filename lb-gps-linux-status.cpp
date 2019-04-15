@@ -55,7 +55,7 @@ int main(int argc, char **argv)
    */
 
 
-      printf("Trying to open device %s\n", argv[1]);
+      printf("Opening device %s\n", argv[1]);
 
       fd = open(argv[1], O_RDWR|O_NONBLOCK);
 
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
       if (res < 0)
             perror("HIDIOCGRAWNAME");
       else
-            printf("Raw Name: %s\n", buf);
+            printf("Device Name: %s\n", buf);
             /* Get Status */
             int timeout = 0;
             while (timeout < 1000){

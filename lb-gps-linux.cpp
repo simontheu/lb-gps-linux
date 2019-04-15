@@ -65,10 +65,11 @@ int main(int argc, char **argv)
             printf("      --n1_hs:      from the range [4,5,6,7,8,9,10,11]\n");
             printf("      --nc1_ls:     even integer within the range 2 to 2^20\n");
             printf("      --nc2_ls:     even integer within  the range 2 to 2^20\n");
+            printf("      --bw:         bandwidth integer within  the range 0 to 15\n");
             return -1;
       }
 
-      printf("Trying to open device %s\n", argv[1]);
+      printf("Opening device %s\n", argv[1]);
 
       fd = open(argv[1], O_RDWR|O_NONBLOCK);
 
@@ -81,17 +82,6 @@ int main(int argc, char **argv)
       //Device connected, setup report structs
       memset(&info, 0x0, sizeof(info));
 
-      /* Get Feature */
-      buf[0] = 0x9; /* Report Number */
-      res = ioctl(fd, HIDIOCGFEATURE(256), buf);
-
-      if (res < 0) {
-            perror("HIDIOCGFEATURE");
-      } else {
-            currentSettings->setParamsFromReadBuffer(buf,res);
-            currentSettings->printParameters();
-      }
-
       // Get Raw Info
       res = ioctl(fd, HIDIOCGRAWINFO, &info);
       
@@ -101,22 +91,47 @@ int main(int argc, char **argv)
       } 
       else
       {
-            printf("Raw Info:\n");
-            printf("\tbustype: %d (%s)\n",
-            info.bustype, bus_str(info.bustype));
-            printf("\tvendor: 0x%04hx\n", info.vendor);
-            printf("\tproduct: 0x%04hx\n", info.product);
+            if (info.vendor != VID_LB_USB || (info.product != PID_GPS_CLOCK && info.product != PID_MINI_GPS_CLOCK)) {
+                  perror("Not a valid GPS Clock Device");
+                  printf("Device Info:\n");
+                  printf("\tvendor: 0x%04hx\n", info.vendor);
+                  printf("\tproduct: 0x%04hx\n", info.product);
+                  return -1;//Device not valid
+            }
       }
 
       /* Get Raw Name */
       res = ioctl(fd, HIDIOCGRAWNAME(256), buf);
 
-      if (res < 0)
+      if (res < 0) {
             perror("HIDIOCGRAWNAME");
-      else
-            printf("Raw Name: %s\n", buf);
+      }
+      else {
+            printf("Connected To: %s\n", buf);
+      }
 
+      /* Get Feature */
+      buf[0] = 0x9; /* Report Number */
+      res = ioctl(fd, HIDIOCGFEATURE(256), buf);
+
+      if (res < 0) {
+            perror("HIDIOCGFEATURE");
+      } else {
+            currentSettings->setParamsFromReadBuffer(buf,res);
+            printf("\nCurrent Settings:\n");
+            currentSettings->printParameters();
+            printf("\n");
+      }
+
+      /* Get Raw Name */
+      res = ioctl(fd, HIDIOCGRAWNAME(256), buf);
+
+      if (res < 0) {
+            perror("HIDIOCGRAWNAME");
+      }
+      else {
             currentSettings->GPSSettings::processCommandLineArguments(argc, argv);
+            printf("\nNew Settings:\n");
             currentSettings->GPSSettings::printParameters();
             currentSettings->GPSSettings::verifyParameters();
             currentSettings->GPSSettings::getSendBuffer(buf,60);
@@ -124,7 +139,7 @@ int main(int argc, char **argv)
             /* Set Feature */
             res = ioctl(fd, HIDIOCSFEATURE(60), buf);
             if (res < 0) perror("HIDIOCSFEATURE");
-
+      }
       close(fd);
 
       return 0;
