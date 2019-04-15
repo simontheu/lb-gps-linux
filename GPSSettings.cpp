@@ -186,17 +186,15 @@ using namespace std;
     {
         double VCO = (double(GPSFrequency) / double(N31)) * double(N2_HS) * double(N2_LS);
         if (N31 < kN31LowerLimit || N31 > kN31UpperLimit) {
-            printf("\n[Warning] Invalid Parameter: N31\n");
+            printf("\e[0;33m[Warning]\e[0m Invalid Parameter: N31\n");
             printf("N31 Should be in the range from %i to %i\n", kN31LowerLimit, kN31UpperLimit);
         }
         if (bandwidth < kBandwidthLowerLimit || bandwidth > kBandwidthUpperLimit) {
-            printf("\n[Warning] Invalid Parameter: bw\n");
+            printf("\e[0;33m[Warning]\e[0m Invalid Parameter: bw\n");
             printf("Bandwidth should be in the range from %i to %i\n", kBandwidthLowerLimit, kBandwidthUpperLimit);
         }
         if (VCO < kVCOLowerLimit || VCO > kVCOUpperLimit) {
-            printf("\e[0;33m[Warning]\e[0m ");
-            printf("Invalid Parameters\n");
-            
+            printf("\e[0;33m[Warning]\e[0m Invalid Parameters\n");            
             printf("The VCO should fall between %fHz to %fHz\n", kVCOLowerLimit, kVCOUpperLimit);
         }
     }
