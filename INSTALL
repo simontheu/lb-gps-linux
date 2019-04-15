@@ -1,0 +1,12 @@
+1. first to do is fix the /dev/hidrawX permissions for users
+  $ cd /etc/udev/rules.d
+  $ cat > 54-hidraw-plugdev.rules
+  KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev"
+  ^D
+  $ service udev restart
+
+2. check your login with 'id -a' (and add yourself to the plugdev group, if not already a member)
+  $ sudo usermod -a -G plugdev <login>
+  [does not take effect until next login or 'sudo su - <login>']
+
+3. let's use the multi-platform HIDAPI library ( see http://github.com/signal11/hidapi )
