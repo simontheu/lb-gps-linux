@@ -18,7 +18,7 @@ gcc -o lb-gps-status lb-gps-linux-status.cpp -lstdc++
 
 ## Usage for lb-gps ##
 ```
-usage: lb-gps /dev/hidraw?? [--n31] [--n2_ls] [--n2_hs] [--n1_hs] [--nc1_ls] [--nc2_ls]
+usage: lb-gps /dev/hidraw?? [--n31] [--n2_ls] [--n2_hs] [--n1_hs] [--nc1_ls] [--nc2_ls] [--bw]
       --gps:        integer within the range of 1 to 5000000
       --n31:        integer within the range 1 to 2^19
       --n2_ls:      even integer within the range 2 to 2^20
