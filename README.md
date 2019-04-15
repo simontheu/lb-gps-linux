@@ -25,7 +25,8 @@ usage: lb-gps /dev/hidraw?? [--n31] [--n2_ls] [--n2_hs] [--n1_hs] [--nc1_ls] [--
       --n2_hs:      from the range [4,5,6,7,8,9,10,11]
       --n1_hs:      from the range [4,5,6,7,8,9,10,11]
       --nc1_ls:     even integer within the range 2 to 2^20
-      --nc2_ls:     even integer within  the range 2 to 2^20
+      --nc2_ls:     even integer within the range 2 to 2^20
+      --bw:         bandwidth integer within the range 0 to 15
 ```
 
 ## Usage for lb-gps-status ##
