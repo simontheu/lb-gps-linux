@@ -41,6 +41,7 @@ using namespace std;
         buf[0] = 0; //reportID; // Report Number
         buf[1] = 0x04;// reportTag for set clock settings
 
+        
         memcpy(&buf[0x2], &GPSFrequency,           3 * sizeof(u_int8_t));
         memcpy(&buf[0x5], &tempN31,                3 * sizeof(u_int8_t));
         memcpy(&buf[0x8], &tempN2_HS,              1 * sizeof(u_int8_t));
