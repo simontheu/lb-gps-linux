@@ -1,3 +1,17 @@
+#ifndef _LINUX_TYPES_H
+  #include <linux/types.h>
+#endif /* _LINUX_TYPES_H */
+#ifndef	_SYS_TYPES_H
+  #include <sys/types.h>
+#endif	/* _SYS_TYPES_H */
+#ifndef _STDINT_H
+  #include <stdint.h>
+#endif /* _STDINT_H */
+
+#ifndef _HIDRAW_H
+  #include <linux/hidraw.h>  // might not need this later. need it now for GPSSettings.cpp
+#endif /* _HIDRAW_H */
+
 //USB ID Defines
 #define VID_LB_USB 0x1dd2
 #define PID_GPS_CLOCK 0x2210
