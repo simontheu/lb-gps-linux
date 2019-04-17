@@ -9,4 +9,4 @@
   $ sudo usermod -a -G plugdev <login>
   [does not take effect until next login or 'sudo su - <login>']
 
-3. let's use the multi-platform HIDAPI library ( see http://github.com/signal11/hidapi )
+3. let's use the multi-platform HIDAPI library ( see https://github.com/signal11/hidapi )

@@ -7,6 +7,15 @@
 #ifndef _STDINT_H
   #include <stdint.h>
 #endif /* _STDINT_H */
+#ifndef _UNISTD_H
+  #include <unistd.h>
+#endif /* _UNISTD_H */
+#ifndef _GETOPT_H
+  #include <getopt.h>
+#endif /* _GETOPT_H */
+#ifndef _STRING_H
+  #include <string.h>
+#endif /* _STRING_H */
 
 #ifndef _HIDRAW_H
   #include <linux/hidraw.h>  // might not need this later. need it now for GPSSettings.cpp
@@ -18,7 +27,7 @@
 #define PID_MINI_GPS_CLOCK 0x2211
 
 /* Flag set by ‘--verbose’. */
-static int verbose_flag;
+static int verbose_flag = 0;
 
 //Limits for parameters
 static const uint32_t kN31LowerLimit = 1;
