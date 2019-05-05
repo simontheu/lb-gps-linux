@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 	while (1) {
 		static struct option long_options[] =
 			{
-				/* this options sets a flag */
+				/* first option sets a flag */
 				{"verbose", no_argument, &verbose_flag, 1},
 				{"help", no_argument, NULL, 'h'},
 				{0, 0, 0, 0}
@@ -138,12 +138,9 @@ int main(int argc, char* argv[])
 	}
 
 	// Set the hid_read() function to be non-blocking.
-//	hid_set_nonblocking(handle, 1);
+	// hid_set_nonblocking(handle, 1);
 
 	memset(buf,0x00,sizeof(buf));
-	// Read requested state. hid_read() has been set to be
-	// non-blocking by the call to hid_set_nonblocking() above.
-	// This loop demonstrates the non-blocking nature of hid_read().
 	res = 0;
 	while (res == 0) {
 		res = hid_read(handle, buf, sizeof(buf));
@@ -151,7 +148,10 @@ int main(int argc, char* argv[])
 			printf("waiting...\n");
 		if (res < 0)
 			printf("hid_read() unsuccessful\n");
-		// use next part when hid_read() is non-blocking
+		// Read requested state. when hid_read() has been set to be
+		// non-blocking by the call to hid_set_nonblocking() above.
+		// This part of loop demonstrates the non-blocking nature of hid_read().
+		// -->> use next part when hid_read() is non-blocking
 		/*		#ifdef WIN32
 		Sleep(500);
 		#else
@@ -169,26 +169,71 @@ int main(int argc, char* argv[])
 		}
 		printf("\n");
 	}
-
+	
 	printf("\n  Loss of signal count: %i\n", buf[0]);
-	if (buf[1] & 0x01) {
-		printf("  Sat Status: Unlocked\n");
-	} else {
-		printf("  Sat Status: Locked\n");
-	}
-	if (buf[1] & 0x02) {
-		printf("  PLL Status: Unlocked\n");
-	} else {
-		printf("  PLL Status: Locked\n");
-	}
+	printf(  "  Sat Status: %s", ((buf[1] & 0x01) ? "Unlocked" : "Locked"));
+	printf("\n  PLL Status: %s", ((buf[1] & 0x02) ? "Unlocked" : "Locked"));
+	printf("\n");
 
-	hid_close(handle); // todo: iterate on GPS devices found
+	memset(buf,0x00,sizeof(buf));
+	buf[0] = 0x9; // request Report ID 0x9
+	res = hid_get_feature_report(handle, buf, sizeof(buf));
+	if (res == -1) {
+		fprintf(stderr, "unable to request Report ID 0x9\n");
+		return -1;
+	}
+	
+	if (verbose_flag) {
+		printf("\n  Data read (%i bytes):\n    ", res);
+		// Print out the returned buffer.
+		for (int i = 0; i < res; i++) {
+			if (i && !(i % 32)) printf("\n    ");
+			printf("%02hhx ", buf[i]);
+		}
+		printf("\n");
+	}
+	
+	unsigned int N1_HS = buf[12] + 4;
+	unsigned int NC1_LS = (buf[15]<<16) + (buf[14]<<8) + buf[13] + 1;
+	unsigned int NC2_LS = (buf[18]<<16) + (buf[17]<<8) + buf[16] + 1;
+	unsigned int N31 = (buf[7]<<16) + (buf[6]<<8) + buf[5] + 1;
+	unsigned int N2_HS = buf[8] + 4;
+	unsigned int N2_LS = (buf[11]<<16) + (buf[10]<<8) + buf[9] + 1;
+
+	unsigned int GPSfreq = (buf[4]<<16) + (buf[3]<<8) + buf[2];
+	
+	double VCO = (double(GPSfreq) / double(N31)) * double(N2_HS) * double(N2_LS);
+	
+	double Out1 = VCO / double(N1_HS) / double(NC1_LS);
+	double Out2 = VCO / double(N1_HS) / double(NC2_LS);
+
+	printf("\n  Output 1 = %s", ((buf[0] & 0x01) ? "enabled" : "disabled"));
+	printf("\n  Output 2 = %s", (((buf[0] & 0x02)>>1) ? "enabled" : "disabled"));
+	printf("\n\n");
+	
+	printf(  "  Output 1 = %.0f Hz\n", Out1);
+	printf(  "  Output 2 = %.0f Hz\n\n", Out2);
+	printf(  "  Output drive = Level %u\n\n", buf[1]); // 0,1,2, or 3 [?] -> 8,16,24,32mA
+	
+	if (verbose_flag) {
+		printf("  Bandwidth     = %u\n", buf[20]);
+		printf("  GPS Ref freq. = %u Hz\n", GPSfreq);
+		printf("  N31     = %u\n", N31);
+		printf("  N2_HS   = %u\n", N2_HS);
+		printf("  N2_LS   = %u\n", N2_LS);
+		printf("  N1_HS   = %u\n", N1_HS);
+		printf("  NC1_LS  = %u\n", NC1_LS);
+		printf("  NC2_LS  = %u\n", NC2_LS);
+		printf("  VCO     = %.0f Hz\n\n", VCO);
+	}
+	
+	hid_close(handle); // todo: iterate on all GPS devices found
 
 	/* Free static HIDAPI objects. */
 	hid_exit();
 
 #ifdef WIN32
-	system("pause");
+	system("pause"); // console might be in a window. wait for user.
 #endif
 
 	return buf[1] & 0x03; // return locked statuses (normally 0)
