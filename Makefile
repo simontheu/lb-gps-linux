@@ -9,7 +9,9 @@ gpsdo-status: gpsdo-status.cpp libhidapi-hidraw.so
 libhidapi-hidraw.so:
 	ln -s libhidapi-hidraw.so.0 libhidapi-hidraw.so
 
-lb-gps-linux: lb-gps-linux-status.cpp lb-gps-linux.cpp GPSSettings.cpp
+all: gpsdo-status lb-gps-utils
+
+lb-gps-utils: lb-gps-linux-status.cpp lb-gps-linux.cpp GPSSettings.cpp
 	gcc ${CFLAGS} -o lb-gps-linux-status lb-gps-linux-status.cpp -I. -lstdc++
 	gcc ${CFLAGS} -o lb-gps-linux lb-gps-linux.cpp GPSSettings.cpp -I. -lstdc++
 
