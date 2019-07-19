@@ -66,6 +66,8 @@ int main(int argc, char **argv)
             printf("      --nc1_ls:     even integer within the range 2 to 2^20\n");
             printf("      --nc2_ls:     even integer within  the range 2 to 2^20\n");
             printf("      --bw:         bandwidth integer within  the range 0 to 15\n");
+            printf(" -- The following parameters can only be changed exclusively -- \n");
+            printf("      --ds:         drive strength (in mA) from the range [8, 16, 24, 32]\n");
             return -1;
       }
 

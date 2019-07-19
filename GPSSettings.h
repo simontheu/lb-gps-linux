@@ -80,4 +80,7 @@ class GPSSettings {
     //Checks current instance parameters and reports if any are outside of the window.
     void verifyParameters();
 
+    //Gets the indexed value of drive strength for the report buffer from mA value
+    uint8_t getDriveStrength(uint8_t driveInmA);
+    
 } ;
