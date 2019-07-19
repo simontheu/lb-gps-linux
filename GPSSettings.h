@@ -1,10 +1,33 @@
+#ifndef _LINUX_TYPES_H
+  #include <linux/types.h>
+#endif /* _LINUX_TYPES_H */
+#ifndef	_SYS_TYPES_H
+  #include <sys/types.h>
+#endif	/* _SYS_TYPES_H */
+#ifndef _STDINT_H
+  #include <stdint.h>
+#endif /* _STDINT_H */
+#ifndef _UNISTD_H
+  #include <unistd.h>
+#endif /* _UNISTD_H */
+#ifndef _GETOPT_H
+  #include <getopt.h>
+#endif /* _GETOPT_H */
+#ifndef _STRING_H
+  #include <string.h>
+#endif /* _STRING_H */
+
+#ifndef _HIDRAW_H
+  #include <linux/hidraw.h>  // might not need this later. need it now for GPSSettings.cpp
+#endif /* _HIDRAW_H */
+
 //USB ID Defines
 #define VID_LB_USB 0x1dd2
 #define PID_GPS_CLOCK 0x2210
 #define PID_MINI_GPS_CLOCK 0x2211
 
 /* Flag set by ‘--verbose’. */
-static int verbose_flag;
+static int verbose_flag = 0;
 
 //Limits for parameters
 static const uint32_t kN31LowerLimit = 1;
