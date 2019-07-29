@@ -29,13 +29,14 @@ void GPSSettings::getSendBuffer (u_int8_t buf[], int length) {
     //Clear the buffer to 0
     memset(buf, 0x0, length);
     buf[0] = 0; //reportID; // Report Number
-    if (driveStrength == 8 ||driveStrength == 16 ||driveStrength == 24 ||driveStrength == 32) {
+    if (isChangingDriveStrength) {
+        printf("Drive!");
         //Drive strength can only be changed exclusively
         memset(buf, 0x0, length);
         buf[1] = 0x03;// reportTag for drive strength clock settings
-        buf[2] = getDriveStrength(driveStrength);
+        buf[2] = getDriveStrengthBufVal(driveStrength);
     } else {
-        
+        printf("Non drive");
         buf[1] = 0x04;// reportTag for set clock settings
         //Adjust parameters before applying to buffer
         uint32_t tempN31 = N31 - 1;
@@ -170,6 +171,7 @@ int GPSSettings::processCommandLineArguments(int argc, char **argv)
                 break;
             
             case 'h'://Drive
+                isChangingDriveStrength = true;
                 driveStrength = atoi(optarg);
                 break;
             
@@ -205,7 +207,7 @@ void GPSSettings::verifyParameters()
     }
 }
 
-uint8_t GPSSettings::getDriveStrength(uint8_t driveInmA)
+uint8_t GPSSettings::getDriveStrengthBufVal(uint8_t driveInmA)
 {
     switch (driveInmA)
     {

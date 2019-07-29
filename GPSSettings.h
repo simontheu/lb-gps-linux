@@ -42,13 +42,14 @@ static const double kVCOUpperLimit = 6500000000.0;
 class GPSSettings {
     public:
     
-    uint8_t out1Enabled;// = 0
-    uint8_t out2Enabled;// = 0;
+    uint8_t out1Enabled;
+    uint8_t out2Enabled;
     
-    uint8_t driveStrength;// = 0;
+    bool isChangingDriveStrength = false;
+    uint8_t driveStrength;
 
     uint8_t reportID;// = 0x0; //Report ID Unused
-    uint8_t reportTag;// = 0x4; //Change clock settings tag
+    uint8_t reportTag;// = 0x4; //Change clock settings tag, 0x03 change drive strength tag
 
     uint32_t GPSFrequency;//  = 0;  // 800Hz - 10 000 000Hz
     uint32_t N31;// = 2 -1;//1,2,4,5...2**21
@@ -81,6 +82,6 @@ class GPSSettings {
     void verifyParameters();
 
     //Gets the indexed value of drive strength for the report buffer from mA value
-    uint8_t getDriveStrength(uint8_t driveInmA);
+    uint8_t getDriveStrengthBufVal(uint8_t driveInmA);
     
 } ;
