@@ -37,3 +37,16 @@ usage: lb-gps-status /dev/hidraw??
 ```
 The command shows current lock status, and returns the following values:
 For Sat unlocked, return value is 1, for PLL unlocked the value is 2, for both unlocked the value is 3. 0 is returned if both are locked.
+
+## Compiling on the Raspberry Pi
+
+The provided hidapi-hidraw library in this repository is not compatible with the ARM architecture of the Raspberry Pi. To be able to compile `gpsdo-status` on the Pi, you'll need to fetch the correct version and provide a link to it before calling `make`.
+
+To do so:
+
+```
+sudo apt update
+sudo apt install libhidapi-hidraw0 libhidapi-libusb0
+ln -s /usr/lib/arm-linux-gnueabihf/libhidapi-hidraw.so.0
+make
+```
