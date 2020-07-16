@@ -39,6 +39,10 @@ static const uint32_t kBandwidthUpperLimit = 15;
 static const double kVCOLowerLimit = 3500000000.0;
 static const double kVCOUpperLimit = 6500000000.0;
 
+static const uint8_t kN2_HSLowerLimit = 4;
+static const uint8_t kN2_HSUpperLimit = 11;
+
+
 class GPSSettings {
     public:
     

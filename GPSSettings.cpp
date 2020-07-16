@@ -186,7 +186,8 @@ int GPSSettings::processCommandLineArguments(int argc, char **argv)
             default:
                 abort ();
         }
-    } 
+    }
+    return 0;
 }
 
 
@@ -204,6 +205,10 @@ void GPSSettings::verifyParameters()
     if (VCO < kVCOLowerLimit || VCO > kVCOUpperLimit) {
         printf("\e[0;33m[Warning]\e[0m Invalid Parameters\n");            
         printf("The VCO should fall between %fHz to %fHz\n", kVCOLowerLimit, kVCOUpperLimit);
+    }
+        if (N2_HS < kN2_HSLowerLimit || N2_HS > kN2_HSUpperLimit) {
+        printf("\e[0;33m[Error]\e[0m Invalid Parameters\n");            
+        printf("N2_HS should be an integer in the range %i to %i\n", kN2_HSLowerLimit, kN2_HSUpperLimit);
     }
 }
 
