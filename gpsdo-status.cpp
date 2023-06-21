@@ -124,14 +124,15 @@ int main(int argc, char* argv[])
 				printf("\n  device path:  %s\n", cur_dev->path);
 				printf(  "  Interface:    %d\n\n",  cur_dev->interface_number);
 			}
+			
+			break;
 		}
 		cur_dev = cur_dev->next;
 	}
 	hid_free_enumeration(devs);
 
 	// Open the device using the VID, PID, and optionally the Serial number.
-	// todo: (need to permit opening MINI_GPS_CLOCK [if found])
-	handle = hid_open(VID_LB_USB, PID_GPS_CLOCK, NULL);
+	handle = hid_open(VID_LB_USB, cur_dev->product_id, NULL);
 	if (!handle) {
 		fprintf(stderr, "unable to open device\n");
  		return -1;
